@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kawaii Match - Prototip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #ffb6d9;
+    --pink-dark: #ff8fc4;
+    --lavender: #d9c9ff;
+    --mint: #b8f2e6;
+    --sky: #bde0fe;
+    --cream: #fff6ec;
+    --text-dark: #6b4f6b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(160deg, #ffe5f1 0%, #e8d9ff 50%, #d9ecff 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-x: hidden;
+  }
+
+  .phone-frame {
+    width: 100%;
+    max-width: 420px;
+    background: var(--cream);
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(150, 100, 150, 0.25);
+    padding: 20px 18px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .phone-frame::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle, var(--pink) 0%, transparent 70%);
+    opacity: 0.5;
+    border-radius: 50%;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header h1 {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: var(--text-dark);
+    letter-spacing: 0.5px;
+  }
+
+  .header h1 span { color: var(--pink-dark); }
+
+  .stats-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 14px 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat-pill {
+    flex: 1;
+    background: white;
+    border-radius: 16px;
+    padding: 7px 4px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(150,100,150,0.1);
+  }
+
+  .stat-pill .label {
+    font-size: 9px;
+    color: #b39ab3;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .stat-pill .value {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 18px;
+    color: var(--text-dark);
+    font-weight: 700;
+  }
+
+  .stat-pill .value#level {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .progress-track {
+    height: 10px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    box-shadow: inset 0 1px 4px rgba(150,100,150,0.15);
+    position: relative;
+    z-index: 1;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink) 0%, var(--pink-dark) 100%);
+    border-radius: 8px;
+    transition: width 0.35s ease;
+    width: 0%;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    background: white;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: inset 0 2px 8px rgba(150,100,150,0.1);
+    position: relative;
+    z-index: 1;
+    touch-action: none;
+  }
+
+  .tile {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background: var(--tile-bg, #f5eefc);
+    position: relative;
+    touch-action: none;
+  }
+
+  .tile.selected {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px var(--pink-dark);
+    z-index: 2;
+  }
+
+  .tile.matched {
+    animation: pop 0.35s ease forwards;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(1); opacity: 1; }
+    60% { transform: scale(1.3); opacity: 0.6; }
+    100% { transform: scale(0); opacity: 0; }
+  }
+
+  .footer-msg {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #b39ab3;
+    font-weight: 600;
+    min-height: 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .restart-btn {
+    display: block;
+    margin: 14px auto 0;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--pink-dark) 100%);
+    color: white;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 20px;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(255,143,196,0.4);
+    position: relative;
+    z-index: 1;
+    transition: transform 0.15s ease;
+  }
+
+  .restart-btn:active { transform: scale(0.95); }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,246,236,0.95);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 32px;
+    z-index: 10;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .overlay.show { display: flex; }
+
+  .overlay .emoji { font-size: 48px; margin-bottom: 10px; }
+  .overlay h2 { font-family: 'Baloo 2', sans-serif; color: var(--text-dark); font-size: 22px; margin-bottom: 6px; }
+  .overlay p { color: #b39ab3; font-size: 14px; margin-bottom: 16px; }
+
+  .diff-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 10px 4px 4px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .diff-screen .sub {
+    text-align: center;
+    color: #b39ab3;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .diff-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: white;
+    border: 2px solid transparent;
+    border-radius: 18px;
+    padding: 14px 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(150,100,150,0.1);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+    text-align: left;
+  }
+
+  .diff-card:active { transform: scale(0.97); }
+
+  .diff-card .icon { font-size: 30px; }
+
+  .diff-card .info h3 {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 17px;
+    color: var(--text-dark);
+  }
+
+  .diff-card .info p {
+    font-size: 12px;
+    color: #b39ab3;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .diff-card.easy { border-color: var(--mint); }
+  .diff-card.medium { border-color: var(--sky); }
+  .diff-card.hard { border-color: var(--pink-dark); }
+
+  .top-bar-link {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #c9a8c9;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="header">
+    <h1>Kawaii <span>Match</span></h1>
+  </div>
+
+  <div id="diffScreen" class="diff-screen">
+    <div class="sub">Zorluk seç, hadi başlayalım!</div>
+    <div class="diff-card easy" data-diff="easy">
+      <div class="icon">🌱</div>
+      <div class="info">
+        <h3>Kolay</h3>
+        <p>6x6 tahta · 4 tatlı türü · Bol hamle</p>
+      </div>
+    </div>
+    <div class="diff-card medium" data-diff="medium">
+      <div class="icon">🌸</div>
+      <div class="info">
+        <h3>Orta</h3>
+        <p>7x7 tahta · 5 tatlı türü · Dengeli tempo</p>
+      </div>
+    </div>
+    <div class="diff-card hard" data-diff="hard">
+      <div class="icon">🔥</div>
+      <div class="info">
+        <h3>Zor</h3>
+        <p>8x8 tahta · 6 tatlı türü · Az hamle, yüksek hedef</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameScreen" class="hidden">
+    <div class="stats-bar">
+      <div class="stat-pill">
+        <div class="label">Level</div>
+        <div class="value" id="level">1</div>
+      </div>
+      <div class="stat-pill">
+        <div class="label">Skor</div>
+        <div class="value" id="score">0</div>
+      </div>
+      <div class="stat-pill">
+        <div class="label">Hamle</div>
+        <div class="value" id="moves">20</div>
+      </div>
+      <div class="stat-pill">
+        <div class="label">Hedef</div>
+        <div class="value" id="target">300</div>
+      </div>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="board" id="board"></div>
+
+    <div class="footer-msg" id="msg">Bir tatlıyı komşusuna doğru kaydır!</div>
+
+    <button class="restart-btn" id="restart">🔄 Baştan Başla</button>
+    <div class="top-bar-link" id="changeDiff">Zorluk Değiştir</div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="emoji" id="overlayEmoji">🎉</div>
+    <h2 id="overlayTitle">Harika!</h2>
+    <p id="overlayText">Hedefi tuttun!</p>
+    <button class="restart-btn" id="overlayAction">Sonraki Level</button>
+    <div class="top-bar-link hidden" id="overlaySecondary">Bu bölümde kalıp tekrar oynamak istiyorum</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ALL_ICONS = ['🐻','🐱','🌸','🍡','🦄','🌙'];
+  const ALL_COLORS = ['#ffe3ec','#e8f0ff','#ffe9f7','#fff3e0','#f0e6ff','#e3f7f0'];
+
+  const TIER_ORDER = ['easy', 'medium', 'hard'];
+  const TIER_LABELS = { easy: 'Kolay', medium: 'Orta', hard: 'Zor' };
+  const TIER_LEVELS = { easy: 100, medium: 200, hard: 300 };
+
+  const DIFFICULTIES = {
+    easy:   { size: 6, iconCount: 4, baseMoves: 24, movesFloor: 18, baseTarget: 150, targetStep: 8,  rampCap: 20 },
+    medium: { size: 7, iconCount: 5, baseMoves: 20, movesFloor: 14, baseTarget: 250, targetStep: 10, rampCap: 30 },
+    hard:   { size: 8, iconCount: 6, baseMoves: 16, movesFloor: 10, baseTarget: 350, targetStep: 10, rampCap: 50 }
+  };
+
+  let tierIndex = 0;
+  let levelInTier = 1;
+  let diffKey = null;
+  let cfg = null;
+  let SIZE = 7;
+  let ICONS = ALL_ICONS.slice(0,5);
+  let COLORS = ALL_COLORS.slice(0,5);
+
+  let board = [];
+  let score = 0;
+  let levelScore = 0;
+  let moves = 20;
+  let target = 300;
+  let selected = null;
+  let busy = false;
+  let didWin = false;
+
+  const diffScreen = document.getElementById('diffScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  const boardEl = document.getElementById('board');
+  const scoreEl = document.getElementById('score');
+  const movesEl = document.getElementById('moves');
+  const levelEl = document.getElementById('level');
+  const targetEl = document.getElementById('target');
+  const progressFill = document.getElementById('progressFill');
+  const msgEl = document.getElementById('msg');
+  const overlay = document.getElementById('overlay');
+  const overlayAction = document.getElementById('overlayAction');
+  const overlaySecondary = document.getElementById('overlaySecondary');
+
+  function movesForLevel(lv) {
+    const step = Math.min(lv - 1, cfg.rampCap);
+    return Math.max(cfg.movesFloor, cfg.baseMoves - step);
+  }
+  function targetForLevel(lv) {
+    const step = Math.min(lv - 1, cfg.rampCap);
+    return cfg.baseTarget + step * cfg.targetStep;
+  }
+
+  function applyTier(idx) {
+    tierIndex = idx;
+    diffKey = TIER_ORDER[idx];
+    cfg = DIFFICULTIES[diffKey];
+    SIZE = cfg.size;
+    ICONS = ALL_ICONS.slice(0, cfg.iconCount);
+    COLORS = ALL_COLORS.slice(0, cfg.iconCount);
+    boardEl.style.gridTemplateColumns = `repeat(${SIZE}, 1fr)`;
+  }
+
+  function selectDifficulty(key) {
+    applyTier(TIER_ORDER.indexOf(key));
+    diffScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    levelInTier = 1;
+    score = 0;
+    initBoard(true);
+  }
+
+  document.querySelectorAll('.diff-card').forEach(card=>{
+    card.addEventListener('click', ()=> selectDifficulty(card.dataset.diff));
+  });
+
+  document.getElementById('changeDiff').addEventListener('click', ()=>{
+    gameScreen.classList.add('hidden');
+    diffScreen.classList.remove('hidden');
+  });
+
+  function randomIcon(excludeSet) {
+    let idx;
+    do { idx = Math.floor(Math.random()*ICONS.length); }
+    while (excludeSet && excludeSet.has(idx));
+    return idx;
+  }
+
+  function initBoard(keepLevel) {
+    board = [];
+    for (let r=0; r<SIZE; r++) {
+      const row = [];
+      for (let c=0; c<SIZE; c++) {
+        let excl = new Set();
+        if (c>=2 && row[c-1]===row[c-2]) excl.add(row[c-1]);
+        if (r>=2 && board[r-1][c]===board[r-2][c]) excl.add(board[r-1][c]);
+        row.push(randomIcon(excl));
+      }
+      board.push(row);
+    }
+    if (!keepLevel) {
+      levelInTier = 1;
+      score = 0;
+    }
+    levelScore = 0;
+    moves = movesForLevel(levelInTier);
+    target = targetForLevel(levelInTier);
+    selected = null;
+    didWin = false;
+    updateStats();
+    render();
+    msgEl.textContent = 'Bir tatlıyı komşusuna doğru kaydır!';
+  }
+
+  function updateStats() {
+    scoreEl.textContent = score;
+    movesEl.textContent = moves;
+    levelEl.textContent = `${TIER_LABELS[diffKey]} ${levelInTier}/${TIER_LEVELS[diffKey]}`;
+    targetEl.textContent = target;
+    const pct = Math.min(100, Math.round((levelScore/target)*100));
+    progressFill.style.width = pct + '%';
+  }
+
+  function render() {
+    boardEl.innerHTML = '';
+    for (let r=0; r<SIZE; r++) {
+      for (let c=0; c<SIZE; c++) {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        const iconIdx = board[r][c];
+        tile.style.setProperty('--tile-bg', COLORS[iconIdx]);
+        tile.textContent = ICONS[iconIdx];
+        tile.dataset.r = r;
+        tile.dataset.c = c;
+        if (selected && selected.r==r && selected.c==c) tile.classList.add('selected');
+        attachPointerHandlers(tile);
+        boardEl.appendChild(tile);
+      }
+    }
+  }
+
+  // --- Pointer / swipe handling ---
+  let dragState = null; // {startX, startY, r, c, pointerId}
+  const SWIPE_THRESHOLD = 18; // px
+
+  function attachPointerHandlers(tile) {
+    tile.addEventListener('pointerdown', onPointerDown);
+    tile.addEventListener('pointerup', onPointerUp);
+    tile.addEventListener('pointercancel', ()=>{ dragState = null; });
+  }
+
+  function onPointerDown(e) {
+    if (busy || moves<=0) return;
+    const r = parseInt(e.currentTarget.dataset.r);
+    const c = parseInt(e.currentTarget.dataset.c);
+    dragState = { startX: e.clientX, startY: e.clientY, r, c, pointerId: e.pointerId };
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {}
+  }
+
+  function onPointerUp(e) {
+    if (!dragState || busy || moves<=0) { dragState = null; return; }
+    const dx = e.clientX - dragState.startX;
+    const dy = e.clientY - dragState.startY;
+    const absX = Math.abs(dx), absY = Math.abs(dy);
+    const { r, c } = dragState;
+    dragState = null;
+
+    if (Math.max(absX, absY) < SWIPE_THRESHOLD) {
+      // Treat as a tap, not a swipe -> fall back to tap-to-select
+      handleTapSelect(r, c);
+      return;
+    }
+
+    let targetR = r, targetC = c;
+    if (absX > absY) {
+      targetC = c + (dx > 0 ? 1 : -1);
+    } else {
+      targetR = r + (dy > 0 ? 1 : -1);
+    }
+
+    if (targetR < 0 || targetR >= SIZE || targetC < 0 || targetC >= SIZE) return;
+
+    selected = null;
+    swap(r, c, targetR, targetC);
+  }
+
+  function handleTapSelect(r, c) {
+    if (!selected) {
+      selected = { r, c };
+      render();
+      return;
+    }
+    if (selected.r === r && selected.c === c) {
+      selected = null;
+      render();
+      return;
+    }
+    const dr = Math.abs(selected.r - r), dc = Math.abs(selected.c - c);
+    const adjacent = (dr + dc === 1);
+    if (!adjacent) {
+      selected = { r, c };
+      render();
+      return;
+    }
+    const from = selected;
+    selected = null;
+    swap(from.r, from.c, r, c);
+  }
+
+  function swap(r1,c1,r2,c2) {
+    busy = true;
+    [board[r1][c1], board[r2][c2]] = [board[r2][c2], board[r1][c1]];
+    const matches = findMatches();
+    if (matches.length===0) {
+      render();
+      setTimeout(()=>{
+        [board[r1][c1], board[r2][c2]] = [board[r2][c2], board[r1][c1]];
+        busy = false;
+        render();
+        msgEl.textContent = 'Eşleşme yok, tekrar dene!';
+      }, 220);
+      return;
+    }
+    moves--;
+    render();
+    resolveMatches();
+  }
+
+  function findMatches() {
+    const matched = [];
+    for (let r=0; r<SIZE; r++) {
+      let run = [0];
+      for (let c=1; c<SIZE; c++) {
+        if (board[r][c]===board[r][c-1]) run.push(c);
+        else {
+          if (run.length>=3) run.forEach(cc=>matched.push([r,cc]));
+          run=[c];
+        }
+      }
+      if (run.length>=3) run.forEach(cc=>matched.push([r,cc]));
+    }
+    for (let c=0; c<SIZE; c++) {
+      let run=[0];
+      for (let r=1; r<SIZE; r++) {
+        if (board[r][c]===board[r-1][c]) run.push(r);
+        else {
+          if (run.length>=3) run.forEach(rr=>matched.push([rr,c]));
+          run=[r];
+        }
+      }
+      if (run.length>=3) run.forEach(rr=>matched.push([rr,c]));
+    }
+    return matched;
+  }
+
+  function resolveMatches() {
+    const matches = findMatches();
+    if (matches.length===0) {
+      busy = false;
+      checkEndState();
+      return;
+    }
+
+    const gained = matches.length * 10;
+    score += gained;
+    levelScore += gained;
+    updateStats();
+    msgEl.textContent = `${matches.length} tatlı eşleşti! ✨`;
+
+    matches.forEach(([r,c])=>{
+      const el = boardEl.children[r*SIZE+c];
+      if (el) el.classList.add('matched');
+    });
+
+    setTimeout(()=>{
+      matches.forEach(([r,c])=> board[r][c] = -1);
+      for (let c=0; c<SIZE; c++) {
+        let pointer = SIZE-1;
+        for (let r=SIZE-1; r>=0; r--) {
+          if (board[r][c] !== -1) {
+            board[pointer][c] = board[r][c];
+            pointer--;
+          }
+        }
+        for (let r=pointer; r>=0; r--) {
+          board[r][c] = randomIcon();
+        }
+      }
+      render();
+      setTimeout(resolveMatches, 280);
+    }, 300);
+  }
+
+  function checkEndState() {
+    if (levelScore >= target) {
+      didWin = true;
+      const tierMax = TIER_LEVELS[diffKey];
+      const isLastLevelOfTier = levelInTier >= tierMax;
+      const isLastTier = tierIndex >= TIER_ORDER.length - 1;
+
+      if (isLastLevelOfTier && isLastTier) {
+        showOverlay('🏆', 'Oyunu Bitirdin!', `Tüm bölümleri tamamladın. Toplam skor: ${score}`, 'Baştan Başla', false);
+      } else if (isLastLevelOfTier) {
+        const nextTierLabel = TIER_LABELS[TIER_ORDER[tierIndex + 1]];
+        showOverlay('🎉', `${TIER_LABELS[diffKey]} Bölümü Bitti!`, `Şimdi ${nextTierLabel} bölüme geçebilirsin!`, `${nextTierLabel} Bölüme Geç ▶`, true);
+      } else {
+        showOverlay('🎉', `Level ${levelInTier} Tamam!`, `Toplam skor: ${score}`, 'Sonraki Level ▶', false);
+      }
+    } else if (moves <= 0) {
+      didWin = false;
+      if (diffKey === 'easy') {
+        showOverlay('🌟', 'Az Kaldı!', 'Çok yaklaştın, tekrar deneyelim mi?', 'Tekrar Dene', false);
+      } else {
+        showOverlay('😿', 'Hamle Bitti', `Bu levelde ${levelScore} / ${target} puan yaptın.`, 'Tekrar Dene', false);
+      }
+    } else {
+      msgEl.textContent = 'Bir tatlıyı komşusuna doğru kaydır!';
+    }
+  }
+
+  function showOverlay(emoji, title, text, actionLabel, showSecondary) {
+    document.getElementById('overlayEmoji').textContent = emoji;
+    document.getElementById('overlayTitle').textContent = title;
+    document.getElementById('overlayText').textContent = text;
+    overlayAction.textContent = actionLabel;
+    overlaySecondary.classList.toggle('hidden', !showSecondary);
+    overlay.classList.add('show');
+  }
+
+  overlayAction.addEventListener('click', ()=>{
+    overlay.classList.remove('show');
+    if (didWin) {
+      const tierMax = TIER_LEVELS[diffKey];
+      const isLastLevelOfTier = levelInTier >= tierMax;
+      const isLastTier = tierIndex >= TIER_ORDER.length - 1;
+      if (isLastLevelOfTier && isLastTier) {
+        applyTier(0);
+        levelInTier = 1;
+        score = 0;
+      } else if (isLastLevelOfTier) {
+        applyTier(tierIndex + 1);
+        levelInTier = 1;
+      } else {
+        levelInTier++;
+      }
+    }
+    initBoard(true);
+  });
+
+  overlaySecondary.addEventListener('click', ()=>{
+    overlay.classList.remove('show');
+    levelInTier = 1;
+    initBoard(true);
+  });
+
+  document.getElementById('restart').addEventListener('click', ()=>{
+    overlay.classList.remove('show');
+    levelInTier = 1;
+    score = 0;
+    initBoard(true);
+  });
+})();
+</script>
+</body>
+</html>
