@@ -6,8 +6,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kawaii Match - Prototip</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script>
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('selectstart', e => e.preventDefault());
+  </script>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+  * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+html, body { touch-action: manipulation; }
+.board {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+.tile {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  font-size: clamp(18px, 6vw, 26px) !important;
+}
+.header h1 {
+  font-size: 24px !important;
+  text-align: left !important;
+  padding-right: 120px !important;
+  white-space: nowrap !important;
+}
   :root {
     --pink: #ffb6d9;
     --pink-dark: #ff8fc4;
